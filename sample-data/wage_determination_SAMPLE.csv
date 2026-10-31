@@ -1,0 +1,14 @@
+# SAMPLE - NOT A REAL WAGE DETERMINATION
+# This file imitates the layout of a Service Contract Act wage determination for
+# testing only. The rates are invented. Do not use them for any real contract.
+# Real wage determinations are published at https://sam.gov/wage-determinations
+#
+# WAGE DETERMINATION NO.: SAMPLE-WD-0001    REVISION NO.: 1
+# STATE: ZZ (sample)    AREA: Sample County (sample)
+# FRINGE BENEFITS: health and welfare per the H&W rate printed on the WD in your
+# contract (set it in config/settings.yaml); vacation and holidays are not modeled.
+wd_number,revision,state,area,occupation_code,occupation_title,hourly_rate
+SAMPLE-WD-0001,1,ZZ,Sample County,11150,Janitor,17.20
+SAMPLE-WD-0001,1,ZZ,Sample County,11210,"Laborer, Grounds Maintenance",18.05
+SAMPLE-WD-0001,1,ZZ,Sample County,11360,Window Cleaner,18.90
+SAMPLE-WD-0001,1,ZZ,Sample County,27101,Guard I,19.40

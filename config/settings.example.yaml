@@ -1,0 +1,114 @@
+# labor-charge-verifier settings (example)
+#
+# Copy this file to config/settings.yaml and review EVERY value before using
+# the tool on real records. Regulatory values change; the tool never
+# hard-codes them. Each value below records where it came from and when the
+# source was accessed. When you change a value, update its source and date.
+
+tolerances:
+  # Hours difference ignored when comparing invoice, timesheet and payroll hours.
+  hours: 0.25
+  # Dollar difference ignored when comparing amounts (rounding).
+  money: 0.01
+
+workweek:
+  # Day the fixed 7-day workweek starts. Payroll week_start dates must fall on
+  # this day; it is also used to find timesheet weeks with no payroll record.
+  # The sample data uses Sunday.
+  start_day: Sunday
+
+health_and_welfare:
+  # Set this to the health and welfare (H&W) rate printed on the wage
+  # determination INCORPORATED IN YOUR CONTRACT. A new rate announced by DOL
+  # applies to a contract only when a WD carrying it is incorporated.
+  #
+  # Rates published by DOL Wage and Hour Division (WHD):
+  #   AAM 250 (2025-07-07): $5.55/hour; $5.09/hour on contracts subject to EO 13706
+  #   AAM 252 (2026-08-10): $5.92/hour; $5.42/hour on contracts subject to EO 13706
+  # Hawaii and EO 13706 contracts use different rates; see the memoranda.
+  #
+  # The sample data covers February 2026, before AAM 252, so the sample uses $5.55.
+  rate_per_hour:
+    value: 5.55
+    source: "DOL WHD All Agency Memorandum No. 250; index at https://sam.gov/content/wage-determinations/resources/all-agency-memos"
+    accessed: "2026-10-30"
+  # H&W is owed for all hours paid (including paid leave) up to 40 hours per
+  # week and 2,080 hours per year on each contract. This tool applies the
+  # weekly cap; the annual cap is not modeled.
+  weekly_hour_cap:
+    value: 40
+    source: "29 CFR 4.175(a)(1), https://www.ecfr.gov/current/title-29/section-4.175"
+    accessed: "2026-10-30"
+  # "hours_paid" follows 29 CFR 4.175 (regular + overtime + paid leave, capped).
+  # "hours_worked" excludes paid leave hours.
+  basis:
+    value: hours_paid
+    source: "29 CFR 4.175(a)(1)"
+    accessed: "2026-10-30"
+
+overtime:
+  # Basic Fair Labor Standards Act rule: over 40 hours in a workweek at not
+  # less than 1.5 times the regular rate. Special cases are out of scope.
+  weekly_threshold_hours:
+    value: 40
+    source: "29 U.S.C. 207(a)(1), https://www.law.cornell.edu/uscode/text/29/207"
+    accessed: "2026-10-30"
+  multiplier:
+    value: 1.5
+    source: "29 U.S.C. 207(a)(1)"
+    accessed: "2026-10-30"
+
+# Employer payroll tax and insurance rates, in PERCENT, used by the
+# price-adjustment worksheet (FAR 52.222-43(e)). Wage-base caps are not
+# modeled: if most employees will already be over a tax's annual wage base
+# when the increase is paid (for example the $7,000 FUTA base), enter the
+# effective rate you expect, which may be 0.
+payroll_tax_rates:
+  social_security:
+    value: 6.2
+    source: "IRS Topic no. 751, https://www.irs.gov/taxtopics/tc751"
+    accessed: "2026-10-30"
+  medicare:
+    value: 1.45
+    source: "IRS Topic no. 751, https://www.irs.gov/taxtopics/tc751"
+    accessed: "2026-10-30"
+  futa:
+    # 6.0% gross less the 5.4% credit for employers in good standing, on the
+    # first $7,000 of wages per employee per year. Check credit-reduction states.
+    value: 0.6
+    source: "IRS Topic no. 759, https://www.irs.gov/taxtopics/tc759"
+    accessed: "2026-10-30"
+  suta:
+    # EXAMPLE ONLY. State unemployment rates are set for each employer by the
+    # state. Replace with the rate on your state rate notice.
+    value: 2.7
+    source: "Example value for the sample data; replace with your state rate notice"
+    accessed: "2026-10-30"
+  workers_compensation:
+    # EXAMPLE ONLY. Replace with the rate from your policy for the class codes
+    # used on the contract, expressed as a percent of payroll.
+    value: 3.5
+    source: "Example value for the sample data; replace with your policy rate"
+    accessed: "2026-10-30"
+
+price_adjustment:
+  # Days after receipt of a new WD to notify the contracting officer.
+  notice_days:
+    value: 30
+    source: "FAR 52.222-43(f), https://www.acquisition.gov/far/52.222-43"
+    accessed: "2026-10-30"
+  # Social Security, Medicare and unemployment taxes generally apply to wages.
+  # Leave false unless your H&W is paid in cash and is taxed as wages.
+  apply_taxes_to_health_and_welfare: false
+  # Column names containing any of these terms are refused, because
+  # FAR 52.222-43(e) excludes general and administrative costs, overhead and
+  # profit from the adjustment.
+  forbidden_cost_terms:
+    - overhead
+    - ga_rate
+    - g_and_a
+    - general_and_administrative
+    - indirect
+    - profit
+    - fee
+    - markup

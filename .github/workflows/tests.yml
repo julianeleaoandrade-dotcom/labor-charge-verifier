@@ -1,0 +1,26 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Run tests
+        run: pytest -v
+      - name: Run the three commands on the sample data
+        run: |
+          lcv check-invoice --data sample-data --out reports/
+          lcv check-wages --data sample-data --out reports/
+          lcv price-adjustment --input sample-data/price_adjustment_input.csv --out reports/

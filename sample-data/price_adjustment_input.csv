@@ -1,0 +1,4 @@
+contract_id,occupation_code,occupation_title,prior_wd_rate,new_wd_rate,prior_rate_paid,new_rate_paid,prior_hw_rate,new_hw_rate,prior_hw_paid,new_hw_paid,hours,wd_received_date
+CTR-SAMPLE-0001,11150,Janitor,17.20,17.85,17.50,17.85,5.55,5.92,5.55,5.92,24960,2026-09-15
+CTR-SAMPLE-0001,11210,"Laborer, Grounds Maintenance",18.05,18.60,18.05,18.60,5.55,5.92,5.55,5.92,2080,2026-09-15
+CTR-SAMPLE-0001,27101,Guard I,19.40,20.10,20.00,20.50,5.55,5.92,5.55,5.92,12480,2026-09-15

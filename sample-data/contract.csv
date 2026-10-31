@@ -1,0 +1,7 @@
+contract_id,contractor_name,wd_number,post_id,post_name,occupation_code,required_headcount,billing_unit,unit_price,price_effective_start,price_effective_end
+CTR-SAMPLE-0001,Example Facility Services LLC,SAMPLE-WD-0001,P01,Day janitorial,11150,8,hour,28.40,2025-09-01,2026-02-14
+CTR-SAMPLE-0001,Example Facility Services LLC,SAMPLE-WD-0001,P01,Day janitorial,11150,8,hour,29.10,2026-02-15,2026-08-31
+CTR-SAMPLE-0001,Example Facility Services LLC,SAMPLE-WD-0001,P02,Night janitorial,11150,4,hour,30.20,2025-09-01,2026-02-14
+CTR-SAMPLE-0001,Example Facility Services LLC,SAMPLE-WD-0001,P02,Night janitorial,11150,4,hour,30.90,2026-02-15,2026-08-31
+CTR-SAMPLE-0001,Example Facility Services LLC,SAMPLE-WD-0001,P03,Security guard,27101,6,hour,34.50,2025-09-01,2026-02-14
+CTR-SAMPLE-0001,Example Facility Services LLC,SAMPLE-WD-0001,P03,Security guard,27101,6,hour,35.30,2026-02-15,2026-08-31
