@@ -1,6 +1,20 @@
 # Data format
 
-Blank templates for every file are in [templates/](../templates/).
+Blank templates are in [templates/](../templates/): one Excel workbook
+(`labor-charge-verifier-template.xlsx`) and one CSV file per input.
+
+## One Excel workbook or separate CSV files
+
+The same data can be given in either form:
+
+- **Excel workbook (.xlsx).** One worksheet per input, named `Contract`,
+  `Roster`, `Timesheets`, `Payroll`, `Invoice`, `Wage determination` and
+  `Price adjustment`, with the column headers below in the first row that does
+  not start with `#`. Rows whose first cell starts with `#` are guidance and
+  are ignored, as are blank rows and other worksheets (such as
+  `Instructions`). Dates may be typed as Excel dates. Only the worksheets a
+  check needs have to be filled in.
+- **CSV files**, one per input, in one folder, with the file names below.
 
 All inputs are CSV files with a header row (UTF-8, with or without a
 byte-order mark; Windows-1252 and semicolon-separated files saved by

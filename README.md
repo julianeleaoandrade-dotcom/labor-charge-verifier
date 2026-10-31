@@ -82,10 +82,12 @@ checklist of supporting records. A plain-language guide to the clause is in
 ## Try it in your browser
 
 Open **<https://julianeleaoandrade-dotcom.github.io/labor-charge-verifier/>**,
-choose a check, click **Use sample data** and then **Run**. To check your own
-records, download the blank templates from the page (or from
-[templates/](templates/)), fill them in Excel, save them as CSV and select them
-on the page.
+choose a check, click **Use sample data** and then **Run**.
+
+To check your own records, download the **Excel template** from the page (or
+[templates/labor-charge-verifier-template.xlsx](templates/labor-charge-verifier-template.xlsx)),
+fill in its sheets, and choose the file on the page. One workbook fills in all
+three checks. Separate CSV files also work.
 
 The page runs the same Python code as the command-line tool, inside the
 browser tab. The files you select are not uploaded or sent anywhere. The first
@@ -107,6 +109,9 @@ lcv price-adjustment --input sample-data/price_adjustment_input.csv --out report
 pip install -e ".[dev]"
 pytest
 ```
+
+`--data` and `--input` also accept an Excel workbook, for example
+`lcv check-invoice --data sample-data/sample-workbook.xlsx --out reports/`.
 
 The sample data is fictitious and contains errors planted on purpose; they are
 listed in [sample-data/EXPECTED_FINDINGS.md](sample-data/EXPECTED_FINDINGS.md).
@@ -135,10 +140,10 @@ in [docs/data-format.md](docs/data-format.md).
 2. Review **every** value, in particular the H&W rate (use the rate on the WD
    incorporated in your contract) and your own unemployment and workers'
    compensation rates. Each value records its source and access date.
-3. Put your CSV files in a folder using the formats in
+3. Fill in the Excel template (or CSV files in a folder) using the formats in
    [docs/data-format.md](docs/data-format.md), copying WD rates from the
    official WD on [sam.gov](https://sam.gov/wage-determinations).
-4. Run the commands with `--data your-folder`.
+4. Run the commands with `--data your-workbook.xlsx` or `--data your-folder`.
 
 ## Design principles
 

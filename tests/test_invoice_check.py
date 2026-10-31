@@ -328,3 +328,12 @@ def test_files_saved_by_spreadsheets_are_read(tmp_path, sample_dir, config):
     contract.write_text(contract.read_text().replace(",", ";"))
     findings = check_invoice(load_invoice_data(folder), config)
     assert keys(findings) == EXPECTED_SAMPLE
+
+
+def test_empty_contract_is_a_clear_error(tmp_path, sample_dir):
+    from labor_charge_verifier.common import InputError
+    folder = _copy_sample(tmp_path, sample_dir)
+    contract = folder / "contract.csv"
+    contract.write_text(contract.read_text().splitlines()[0] + "\n")
+    with pytest.raises(InputError, match="contract.csv: no data rows"):
+        load_invoice_data(folder)

@@ -24,6 +24,9 @@ were invented for testing. The wage determination file is marked
   the next option year.
 - The unit prices change in the middle of the month (2026-02-15).
 
+`sample-workbook.xlsx` holds the same data as the CSV files, one worksheet
+per file, and gives exactly the same findings.
+
 The errors below were planted on purpose. Running the commands in the README
 must produce these findings and no others. The test suite checks this
 (`tests/test_invoice_check.py`, `tests/test_wage_check.py`,

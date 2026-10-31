@@ -3,6 +3,30 @@
 All notable changes to this project are listed here. Versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [0.3.0] - 2026-10-31
+
+### Added
+
+- One Excel workbook (.xlsx) as input, as an alternative to separate CSV
+  files: one worksheet per kind of record (Contract, Roster, Timesheets,
+  Payroll, Invoice, Wage determination, Price adjustment). Works on the web
+  page and on the command line (`--data workbook.xlsx`, `--input workbook.xlsx`).
+- `templates/labor-charge-verifier-template.xlsx`: blank workbook with an
+  instructions sheet, a note on every column header, date formats and
+  date/LINE-TOTAL validation.
+- `sample-data/sample-workbook.xlsx`: the sample data in the same layout; it
+  gives the same findings as the CSV files.
+- `scripts/build_workbooks.py` builds both workbooks from the CSV files.
+
+### Changed
+
+- The web page offers the workbook first ("Easiest way") and fills in every
+  check from one file. Error messages name the worksheet instead of the CSV
+  file when the data came from a workbook.
+- Clear error when the contract or roster has no data rows.
+- New dependency: `openpyxl` (MIT). The web page serves its wheel with the
+  page instead of fetching it from another site.
+
 ## [0.2.0] - 2026-10-31
 
 ### Added

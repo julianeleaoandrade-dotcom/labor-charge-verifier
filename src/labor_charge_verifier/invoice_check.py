@@ -59,6 +59,8 @@ class InvoiceData:
 def load_contract(data_dir: Path) -> pd.DataFrame:
     contract = read_csv(data_dir / "contract.csv", CONTRACT_COLUMNS,
                         ["price_effective_start", "price_effective_end"])
+    if contract.empty:
+        raise InputError("contract.csv: no data rows. Add one row per post and price period.")
     contract = to_float(contract, ["unit_price", "required_headcount"], "contract.csv")
     for column in ("price_effective_start", "price_effective_end"):
         if contract[column].isna().any():
@@ -68,6 +70,8 @@ def load_contract(data_dir: Path) -> pd.DataFrame:
 
 def load_roster(data_dir: Path) -> pd.DataFrame:
     roster = read_csv(data_dir / "roster.csv", ROSTER_COLUMNS, ["hire_date", "termination_date"])
+    if roster.empty:
+        raise InputError("roster.csv: no data rows. Add one row per employee on the contract.")
     require_unique(roster, ["employee_id"], "roster.csv")
     return roster
 

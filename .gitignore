@@ -13,6 +13,9 @@ env/
 reports/
 config/settings.yaml
 *.xlsx
+# ...except the blank template and the fictitious sample workbook
+!templates/labor-charge-verifier-template.xlsx
+!sample-data/sample-workbook.xlsx
 .env
 
 # Editors and OS

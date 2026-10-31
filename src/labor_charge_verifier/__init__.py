@@ -1,4 +1,4 @@
 """labor-charge-verifier: checks that labor charges on service contracts are
 backed by payroll, timekeeping and contract or wage-determination rates."""
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"

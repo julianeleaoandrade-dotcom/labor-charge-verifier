@@ -25,10 +25,23 @@
     <section class="steps" aria-label="How it works">
       <ol>
         <li><strong>Choose a check</strong> below.</li>
-        <li><strong>Add your files</strong> (CSV, saved from Excel or your payroll system), or click
-          <em>Use sample data</em> to try it with fictitious data first.</li>
+        <li><strong>Add your data</strong>: one Excel workbook (easiest), or separate CSV files.
+          Or click <em>Use sample data</em> to try it with fictitious data first.</li>
         <li><strong>Click Run</strong>, read the findings and download the report.</li>
       </ol>
+    </section>
+
+    <section class="workbook" aria-labelledby="workbook-title">
+      <h2 id="workbook-title">Easiest way: one Excel workbook</h2>
+      <p>Download the template, fill in the sheets in Excel (one sheet per kind of record) and
+        choose the file here. All checks below are filled in at once.</p>
+      <p class="links">
+        <a href="templates/labor-charge-verifier-template.xlsx" download>Download the Excel template</a>
+        <a href="sample-data/sample-workbook.xlsx" download>Download a filled-in sample (fictitious)</a>
+      </p>
+      <label class="upload">Choose your workbook (.xlsx)
+        <input type="file" id="workbook-input" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" disabled></label>
+      <p id="workbook-status" class="hint" aria-live="polite"></p>
     </section>
 
     <div class="tabs" role="tablist" aria-label="Checks">

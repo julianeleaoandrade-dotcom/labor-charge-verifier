@@ -19,6 +19,7 @@ from labor_charge_verifier.price_adjustment import (SUPPORTING_DOCUMENTS, comput
 from labor_charge_verifier.report import (HTML_STYLE, findings_frame, render_html,
                                           render_markdown, summarize)
 from labor_charge_verifier.wage_check import check_wages, load_wage_data
+from labor_charge_verifier.workbook import SHEETS, workbook_to_csv_texts
 
 CONFIG_PATH = Path("/lcv/config/settings.example.yaml")
 
@@ -91,6 +92,13 @@ def _guard(func):
             return json.dumps({"ok": False, "error": f"Unexpected error: {exc!r}. "
                                "Check that each file matches docs/data-format.md."})
     return wrapper
+
+
+@_guard
+def convert_workbook(path: str) -> dict:
+    files = workbook_to_csv_texts(path)
+    names = {csv_name: sheet for sheet, csv_name in SHEETS.items()}
+    return {"ok": True, "files": files, "sheet_names": {k: names[k] for k in files}}
 
 
 @_guard

@@ -38,7 +38,9 @@ python scripts/build_site.py _site
 python -m http.server 8000 --directory _site
 ```
 
-Then open <http://localhost:8000>. If you add a module to
+Then open <http://localhost:8000>. If you change a CSV in `sample-data/` or
+`templates/`, rebuild the Excel workbooks with
+`python scripts/build_workbooks.py` (a test checks they match). If you add a module to
 `src/labor_charge_verifier/`, add it to `PACKAGE_MODULES` in `web/app.js`
 (a test checks this).
 

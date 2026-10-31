@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import argparse
 import sys
+import tempfile
+from contextlib import contextmanager
 from datetime import date
+from pathlib import Path
 
 from . import __version__
 from .common import InputError, load_config
@@ -12,6 +15,21 @@ from .invoice_check import check_invoice, load_invoice_data
 from .price_adjustment import compute_price_adjustment, describe_deadline, load_price_adjustment_input
 from .report import findings_frame, summarize, write_findings_report, write_price_adjustment_outputs
 from .wage_check import check_wages, load_wage_data
+from .workbook import is_workbook, workbook_to_folder
+
+
+@contextmanager
+def data_folder(path: str):
+    """Yield a folder of CSV files: the folder given, or a temporary folder
+    with the worksheets of an Excel workbook converted to CSV."""
+    if is_workbook(path):
+        with tempfile.TemporaryDirectory() as tmp:
+            workbook_to_folder(path, tmp)
+            yield tmp
+    else:
+        if not Path(path).is_dir():
+            raise InputError(f"--data must be a folder of CSV files or an .xlsx workbook: {path}")
+        yield path
 
 
 def _print_summary(findings, paths, billing: bool = True) -> None:
@@ -27,7 +45,8 @@ def _print_summary(findings, paths, billing: bool = True) -> None:
 
 def cmd_check_invoice(args) -> int:
     config = load_config(args.config)
-    findings = check_invoice(load_invoice_data(args.data), config)
+    with data_folder(args.data) as folder:
+        findings = check_invoice(load_invoice_data(folder), config)
     paths = write_findings_report(findings, args.out, "invoice_check",
                                   "Invoice vs. records - findings", args.data)
     _print_summary(findings, paths)
@@ -36,7 +55,8 @@ def cmd_check_invoice(args) -> int:
 
 def cmd_check_wages(args) -> int:
     config = load_config(args.config)
-    findings = check_wages(load_wage_data(args.data), config)
+    with data_folder(args.data) as folder:
+        findings = check_wages(load_wage_data(folder), config)
     paths = write_findings_report(findings, args.out, "wage_check",
                                   "Wage-determination compliance - findings", args.data)
     _print_summary(findings, paths, billing=False)
@@ -49,7 +69,14 @@ def cmd_price_adjustment(args) -> int:
         as_of = date.fromisoformat(args.as_of) if args.as_of else None
     except ValueError as exc:
         raise InputError(f"--as-of must be a date in YYYY-MM-DD format; got '{args.as_of}'") from exc
-    frame = load_price_adjustment_input(args.input, config)
+    if is_workbook(args.input):
+        with tempfile.TemporaryDirectory() as tmp:
+            written = workbook_to_folder(args.input, tmp)
+            if "price_adjustment_input.csv" not in written:
+                raise InputError(f"{args.input}: no 'Price adjustment' worksheet found.")
+            frame = load_price_adjustment_input(Path(tmp) / "price_adjustment_input.csv", config)
+    else:
+        frame = load_price_adjustment_input(args.input, config)
     result = compute_price_adjustment(frame, config, as_of=as_of)
     paths = write_price_adjustment_outputs(result, args.out, args.input)
     print(f"Total adjustment: USD {result.total_adjustment:,.2f}")
@@ -78,17 +105,20 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = sub.add_parser("check-invoice", parents=[common],
                        help="Module 1: invoice lines vs. roster, timesheets, payroll, prices")
-    p.add_argument("--data", required=True, help="folder with the input CSV files")
+    p.add_argument("--data", required=True,
+                   help="folder with the input CSV files, or an Excel workbook (.xlsx)")
     p.set_defaults(func=cmd_check_invoice)
 
     p = sub.add_parser("check-wages", parents=[common],
                        help="Module 2: payroll vs. wage determination")
-    p.add_argument("--data", required=True, help="folder with the input CSV files")
+    p.add_argument("--data", required=True,
+                   help="folder with the input CSV files, or an Excel workbook (.xlsx)")
     p.set_defaults(func=cmd_check_wages)
 
     p = sub.add_parser("price-adjustment", parents=[common],
                        help="Module 3: FAR 52.222-43 price-adjustment worksheet")
-    p.add_argument("--input", required=True, help="price adjustment input CSV")
+    p.add_argument("--input", required=True,
+                   help="price adjustment input CSV, or an Excel workbook (.xlsx)")
     p.add_argument("--as-of", default=None,
                    help="date used for the 30-day deadline check, YYYY-MM-DD (default: today)")
     p.set_defaults(func=cmd_price_adjustment)

@@ -30,10 +30,11 @@ def test_site_builds(tmp_path):
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     out = tmp_path / "site"
-    module.build(out)
+    module.build(out, wheels=False)
     for path in ["index.html", "app.js", "runner.py", "config/settings.example.yaml",
                  "py/labor_charge_verifier/invoice_check.py", "sample-data/invoice.csv",
-                 "templates/invoice.csv"]:
+                 "templates/invoice.csv", "templates/labor-charge-verifier-template.xlsx",
+                 "sample-data/sample-workbook.xlsx", "wheels/manifest.json"]:
         assert (out / path).is_file(), path
 
 
@@ -51,5 +52,7 @@ def test_runner_works_with_the_package(tmp_path, monkeypatch, sample_dir):
     price = json.loads(runner.run_price(str(sample_dir / "price_adjustment_input.csv"),
                                         "{}", "2026-10-01"))
     assert price["ok"] and price["summary"]["total_adjustment"] == 27358.40
+    book = json.loads(runner.convert_workbook(str(sample_dir / "sample-workbook.xlsx")))
+    assert book["ok"] and book["sheet_names"]["invoice.csv"] == "Invoice"
     bad = json.loads(runner.run_wages(str(tmp_path), "{}"))
     assert bad["ok"] is False and "Missing input file" in bad["error"]

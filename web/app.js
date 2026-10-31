@@ -10,7 +10,7 @@ const DEFAULT_INDEX_URL = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/
 // tests/test_web.py checks this list against src/labor_charge_verifier/.
 const PACKAGE_MODULES = [
   "__init__", "cli", "common", "invoice_check", "price_adjustment", "report", "rules",
-  "wage_check",
+  "wage_check", "workbook",
 ];
 
 const MODULES = {
@@ -42,7 +42,8 @@ const MODULES = {
   },
 };
 
-const state = { pyodide: null, module: "invoice", files: { invoice: {}, wages: {}, price: {} } };
+const state = { pyodide: null, module: "invoice", files: { invoice: {}, wages: {}, price: {} },
+  sheetNames: {} };
 const $ = (selector) => document.querySelector(selector);
 
 function setStatus(text, kind) {
@@ -95,7 +96,20 @@ async function startPython() {
   }
   fs.writeFile("/lcv/config/settings.example.yaml", await fetchText("config/settings.example.yaml"));
   fs.writeFile("/lcv/runner.py", await fetchText("runner.py"));
-  pyodide.runPython("import sys; sys.path.insert(0, '/lcv'); import runner");
+  // Pure-Python wheels served with the page (openpyxl, to read .xlsx files).
+  const wheels = JSON.parse(await fetchText("wheels/manifest.json"));
+  fs.mkdirTree("/lcv/wheels");
+  for (const name of wheels) {
+    fs.writeFile(`/lcv/wheels/${name}`, await fetchBytes(`wheels/${name}`));
+  }
+  pyodide.runPython(`
+import sys, zipfile, pathlib
+for wheel in sorted(pathlib.Path("/lcv/wheels").glob("*.whl")):
+    zipfile.ZipFile(wheel).extractall("/lcv/vendor")
+sys.path.insert(0, "/lcv/vendor")
+sys.path.insert(0, "/lcv")
+import runner
+`);
   return pyodide;
 }
 
@@ -110,6 +124,11 @@ function buildFileRows() {
   for (const container of document.querySelectorAll(".files")) {
     const module = container.dataset.module;
     const config = MODULES[module];
+    const intro = document.createElement("p");
+    intro.className = "hint";
+    intro.textContent = "Files for this check. They are filled in automatically from an Excel "
+      + "workbook, or you can add CSV files one by one.";
+    container.appendChild(intro);
     const list = document.createElement("ul");
     list.className = "file-list";
     for (const [name, label] of config.files) {
@@ -120,7 +139,7 @@ function buildFileRows() {
           <code>${name}</code></label>
         <input type="file" id="${id}" accept=".csv,text/csv">
         <span class="file-state" data-state-for="${name}">Not added</span>
-        <a href="templates/${name}" download>Blank template</a>`;
+        <a href="templates/${name}" download>Blank CSV</a>`;
       item.querySelector("input").addEventListener("change", async (event) => {
         const file = event.target.files[0];
         if (!file) return;
@@ -136,6 +155,40 @@ function buildFileRows() {
     sample.textContent = "Use sample data";
     sample.addEventListener("click", () => useSample(module));
     container.append(list, sample);
+  }
+}
+
+async function loadWorkbook(file) {
+  const box = $("#workbook-status");
+  box.className = "hint";
+  box.textContent = "Reading the workbook...";
+  try {
+    state.pyodide.FS.writeFile("/work-upload.xlsx", new Uint8Array(await file.arrayBuffer()));
+    const result = call("convert_workbook", "/work-upload.xlsx");
+    if (!result.ok) {
+      box.className = "error-box";
+      box.textContent = result.error;
+      return;
+    }
+    const encoder = new TextEncoder();
+    const found = Object.keys(result.files);
+    state.sheetNames = result.sheet_names;
+    for (const [module, config] of Object.entries(MODULES)) {
+      for (const [name] of config.files) {
+        if (result.files[name] !== undefined) {
+          state.files[module][name] = { bytes: encoder.encode(result.files[name]),
+            label: `${file.name} (${result.sheet_names[name]} sheet)`, fromWorkbook: true };
+        }
+      }
+    }
+    box.className = "ok-box";
+    box.textContent = `Loaded ${found.length} worksheet${found.length === 1 ? "" : "s"} from `
+      + `${file.name}: ${found.map((n) => result.sheet_names[n]).join(", ")}. `
+      + "Choose a check below and click Run.";
+    refresh();
+  } catch (error) {
+    box.className = "error-box";
+    box.textContent = `The workbook could not be read (${error.message}).`;
   }
 }
 
@@ -216,10 +269,20 @@ function escapeHtml(text) {
     { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
+function friendlyError(message) {
+  // Name worksheets instead of CSV files when the data came from a workbook.
+  let text = message;
+  for (const [name, entry] of Object.entries(state.files[state.module])) {
+    const sheet = state.sheetNames[name];
+    if (entry.fromWorkbook && sheet) text = text.split(name).join(`the '${sheet}' sheet`);
+  }
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
 function showResult(result) {
   const summary = $("#summary");
   if (!result.ok) {
-    summary.innerHTML = `<p class="error-box"><strong>The files could not be checked.</strong> ${escapeHtml(result.error)}</p>`;
+    summary.innerHTML = `<p class="error-box"><strong>The files could not be checked.</strong> ${escapeHtml(friendlyError(result.error))}</p>`;
     $("#downloads").innerHTML = "";
     $("#report").hidden = true;
     $("#results").hidden = false;
@@ -290,6 +353,10 @@ async function main() {
     tab.addEventListener("click", () => selectTab(tab.id.replace("tab-", "")));
   }
   $("#run").addEventListener("click", run);
+  $("#workbook-input").addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (file && state.pyodide) loadWorkbook(file);
+  });
   selectTab("invoice");
   try {
     state.pyodide = await startPython();
@@ -298,6 +365,7 @@ async function main() {
       $(`#set-${name}`).value = defaults[name];
     }
     $("#version").textContent = `version ${defaults.version}`;
+    $("#workbook-input").disabled = false;
     setStatus("", "ok");
   } catch (error) {
     setStatus(`The checking engine could not load (${error.message}). Check your internet `
