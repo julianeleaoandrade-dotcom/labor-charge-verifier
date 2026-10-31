@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "labor-charge-verifier"
-version = "0.1.0"
+version = "0.2.0"
 description = "Open-source checks that labor charges on service contracts are backed by payroll, timekeeping and contract or wage-determination rates before an invoice is submitted."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -25,6 +25,7 @@ dev = ["pytest>=7.0"]
 
 [project.urls]
 Homepage = "https://github.com/julianeleaoandrade-dotcom/labor-charge-verifier"
+"Browser version" = "https://julianeleaoandrade-dotcom.github.io/labor-charge-verifier/"
 Issues = "https://github.com/julianeleaoandrade-dotcom/labor-charge-verifier/issues"
 
 [project.scripts]

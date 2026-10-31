@@ -1,6 +1,10 @@
 # Data format
 
-All inputs are UTF-8 CSV files with a header row. Dates use `YYYY-MM-DD`.
+Blank templates for every file are in [templates/](../templates/).
+
+All inputs are CSV files with a header row (UTF-8, with or without a
+byte-order mark; Windows-1252 and semicolon-separated files saved by
+spreadsheet programs are also read). Dates use `YYYY-MM-DD`.
 Money is in US dollars with a dot as the decimal separator. Extra columns are
 ignored, except in the price-adjustment input (see below).
 

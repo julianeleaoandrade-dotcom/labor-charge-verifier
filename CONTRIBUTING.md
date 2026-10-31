@@ -30,4 +30,16 @@ pip install -e ".[dev]"
 pytest
 ```
 
+The browser version lives in `web/`. To try it locally, build the site and
+serve it:
+
+```bash
+python scripts/build_site.py _site
+python -m http.server 8000 --directory _site
+```
+
+Then open <http://localhost:8000>. If you add a module to
+`src/labor_charge_verifier/`, add it to `PACKAGE_MODULES` in `web/app.js`
+(a test checks this).
+
 Keep the language of documentation and messages plain and factual.

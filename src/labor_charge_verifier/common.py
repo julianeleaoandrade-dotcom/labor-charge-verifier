@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import io
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
@@ -126,7 +127,9 @@ def read_csv(path: Path, required: list[str], date_columns: list[str] | None = N
     if not path.is_file():
         raise InputError(f"Missing input file: {path}")
     try:
-        frame = pd.read_csv(path, dtype=str, keep_default_na=False, comment=comment)
+        text = _read_text(path)
+        frame = pd.read_csv(io.StringIO(text), dtype=str, keep_default_na=False,
+                            comment=comment, sep=_delimiter(text, comment))
     except pd.errors.EmptyDataError as exc:
         raise InputError(f"{path.name}: the file is empty (no header row).") from exc
     except pd.errors.ParserError as exc:
@@ -140,6 +143,26 @@ def read_csv(path: Path, required: list[str], date_columns: list[str] | None = N
     for column in date_columns or []:
         frame[column] = frame[column].map(lambda v, c=column: _parse_date(v, path.name, c))
     return frame
+
+
+def _read_text(path: Path) -> str:
+    """Read a CSV file saved by common tools. Spreadsheet programs often add a
+    byte-order mark (UTF-8 with BOM) or save in Windows-1252."""
+    raw = path.read_bytes()
+    try:
+        return raw.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        return raw.decode("cp1252")
+
+
+def _delimiter(text: str, comment: str | None) -> str:
+    """Use a semicolon when the header row uses semicolons instead of commas
+    (some spreadsheet locales save CSV files that way)."""
+    for line in text.splitlines():
+        if not line.strip() or (comment and line.lstrip().startswith(comment)):
+            continue
+        return ";" if line.count(";") > line.count(",") else ","
+    return ","
 
 
 def _parse_date(value: str, file_name: str, column: str):

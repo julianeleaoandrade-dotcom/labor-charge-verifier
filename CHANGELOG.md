@@ -3,6 +3,22 @@
 All notable changes to this project are listed here. Versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [0.2.0] - 2026-10-31
+
+### Added
+
+- Browser version: a web page (`web/`), published with GitHub Pages, that runs
+  the same Python package in the browser with Pyodide. No installation; the
+  files a user selects are processed in the browser tab and are not uploaded.
+- Blank CSV templates (`templates/`) for each input file.
+- `scripts/build_site.py` and a GitHub Actions workflow (`pages.yml`) that runs
+  the tests and publishes the page on every push to `main`.
+
+### Changed
+
+- CSV files saved by spreadsheet programs are read as well: UTF-8 with a
+  byte-order mark, Windows-1252 encoding and semicolon-separated files.
+
 ## [0.1.0] - 2026-10-30
 
 First public release.

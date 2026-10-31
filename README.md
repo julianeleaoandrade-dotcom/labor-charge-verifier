@@ -4,6 +4,9 @@ Open-source checks that labor charges on service contracts are backed by
 payroll, timekeeping and contract or wage-determination rates before an
 invoice is submitted.
 
+**Try it in your browser, no installation:**
+**<https://julianeleaoandrade-dotcom.github.io/labor-charge-verifier/>**
+
 [![tests](https://github.com/julianeleaoandrade-dotcom/labor-charge-verifier/actions/workflows/tests.yml/badge.svg)](https://github.com/julianeleaoandrade-dotcom/labor-charge-verifier/actions/workflows/tests.yml)
 ![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
 
@@ -76,7 +79,21 @@ It writes a worksheet, a generic draft notice to the contracting officer and a
 checklist of supporting records. A plain-language guide to the clause is in
 [docs/far-52-222-43-guide.md](docs/far-52-222-43-guide.md).
 
-## Quick start
+## Try it in your browser
+
+Open **<https://julianeleaoandrade-dotcom.github.io/labor-charge-verifier/>**,
+choose a check, click **Use sample data** and then **Run**. To check your own
+records, download the blank templates from the page (or from
+[templates/](templates/)), fill them in Excel, save them as CSV and select them
+on the page.
+
+The page runs the same Python code as the command-line tool, inside the
+browser tab. The files you select are not uploaded or sent anywhere. The first
+time, the page downloads the open-source Python runtime
+([Pyodide](https://pyodide.org)) from a public content network, which takes
+about 20 seconds.
+
+## Quick start (command line)
 
 Requires Python 3.11 or later.
 
@@ -132,8 +149,9 @@ in [docs/data-format.md](docs/data-format.md).
 - **A person decides.** Findings are leads for review. Cases that need
   judgment (an extra position, an unlisted occupation, a late notice) are
   flagged, not resolved.
-- **Local only.** The tool runs on your computer, reads CSV files and writes
-  files. It sends nothing to anyone.
+- **Local only.** The command-line tool runs on your computer, reads CSV files
+  and writes files. The browser version processes files inside the browser tab.
+  Neither sends your data to anyone.
 - **Configuration, not code.** Rates that change (H&W, taxes, tolerances) live
   in the settings file, each with its source and date.
 

@@ -317,3 +317,14 @@ def test_blank_unit_price_is_an_error_not_zero(tmp_path, sample_dir):
     path.write_text("\n".join(lines) + "\n")
     with pytest.raises(InputError, match="blank value in required column 'unit_price'"):
         load_invoice_data(folder)
+
+
+def test_files_saved_by_spreadsheets_are_read(tmp_path, sample_dir, config):
+    """UTF-8 with BOM and semicolon-separated files give the same findings."""
+    folder = _copy_sample(tmp_path, sample_dir)
+    roster = folder / "roster.csv"
+    roster.write_bytes(b"\xef\xbb\xbf" + roster.read_bytes())
+    contract = folder / "contract.csv"
+    contract.write_text(contract.read_text().replace(",", ";"))
+    findings = check_invoice(load_invoice_data(folder), config)
+    assert keys(findings) == EXPECTED_SAMPLE

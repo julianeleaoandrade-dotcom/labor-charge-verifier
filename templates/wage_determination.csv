@@ -1,0 +1,4 @@
+# Copy the rates from the official wage determination incorporated in your
+# contract (https://sam.gov/wage-determinations). One revision per file.
+# Lines starting with # are ignored. Delete these lines if you prefer.
+wd_number,revision,state,area,occupation_code,occupation_title,hourly_rate
